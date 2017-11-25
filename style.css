@@ -100,4 +100,8 @@ a:hover {
   color: red;
 }
 
+.img-circle {
+  border-radius: 50%;
+}
+
 </style>
