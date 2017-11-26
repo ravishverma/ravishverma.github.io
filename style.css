@@ -70,6 +70,7 @@ main {
 
 p {
   color: #555;
+  align: "justify"
 }
 
 /*IE6 fix*/
