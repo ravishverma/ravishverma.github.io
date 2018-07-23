@@ -1,0 +1,230 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<!-- Thanks to
+		Tooltip: http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+	-->
+	<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+	<style>
+		path.states {
+			stroke: black;
+			fill: grey;
+			stroke-width: 0.5px;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+			pointer-events: none;
+		}
+
+		div.tooltip {	
+    		position: absolute;			
+    		text-align: center;								
+    		padding: 2px;				
+    		font: 12px sans-serif;
+    		background: lightblue;
+    		border: 0px;		
+    		border-radius: 8px;			
+    		pointer-events: none;			
+		}
+
+	</style>
+</head>
+
+<body>
+	<h1 style="text-align:center;">Hello Uncle Sam, How was your flight?</h1>
+	<script type="text/javascript">
+		var width = 1000;
+		var height = 650;
+		var margin = 10;
+
+		/* Add a sv graphic */
+		var svg = d3.select("body")
+			.append("svg")
+			.attr("width", width+margin)
+			.attr("height", height+margin)
+			.style('float','left').style('margin-left','150px')
+			
+		var map = svg.append('g')
+			.attr('class','map');
+
+		/* Add a form */
+		var form = d3.select('body')
+			.append('div').attr('class','form');
+
+		var selectYear = form.append('div').text('Year : ')
+			.style('width','105px').style('float','left').style('margin-left','500px')
+			.append("select").attr('id','selectYear');
+
+		for (var i=1987; ; i++) {
+			selectYear.append("option")
+			.attr('value',i)
+			.text(i);
+
+			if (i==2008) {break;}
+		}
+
+		var selectSeason = form.append('div').text(' Season : ')
+			.style('margin-left','20px').style('width','150px').style('float','left')
+			.append("select").attr('id','selectSeason');
+			
+			selectSeason.append('option').attr('value','W').text('Winter')
+			selectSeason.append('option').attr('value','Sp').text('Spring')
+			selectSeason.append('option').attr('value','Su').text('Summer')
+			selectSeason.append('option').attr('value','F').text('Fall');
+
+		var goButton = form.append('div')
+			.style('margin-left','50px').style('float','left')
+			.append('input')
+			.attr('type','button')
+			.attr('onclick','showData()')
+			.attr('value','Show!');
+
+		// Define the div for the tooltip
+		var div = d3.select("body").append("div")	
+   			.attr("class", "tooltip")				
+    		.style("opacity", 0);
+
+		var projection = d3.geo.albersUsa()
+			.translate([margin+width/2, margin+height/2])
+			.scale([1200]);
+
+		var path = d3.geo.path()
+		  	 .projection(projection);
+
+		d3.json("/udacityData/us-states.json", function(json) {
+			map.selectAll("path")
+			.data(json.features)
+			.enter()
+			.append("path")
+			.attr("class","states")
+			.attr("d", path);
+		});
+
+		var routes = svg.append('g')
+			.attr('class','route');
+
+		var cities = svg.append('g')
+			.attr('class','city');
+
+		var airports = {'JFK':'New York',
+					'LAX' :'Los Angeles',
+					'ORD':'Chicago',
+					'IAH':'Houston',
+					'PDX':'Portland',
+					'ABQ':'Albuquerque'
+				};
+
+		function showFlights(data) {
+			var line = d3.svg.line()
+					.x(function(d) { return projection([d[0],d[1]])[0]; })
+					.y(function(d) { return projection([d[0],d[1]])[1]; });
+
+			var color = d3.scale.linear()
+						.domain([0,2.0])
+						.range([d3.rgb('#0000FF'),d3.rgb('#FF0000')]);
+
+			routes.selectAll("path")
+				.data(data)
+				.enter()
+				.append("path")
+				.attr("class","flights")
+				.attr("d", function(d) {
+					return line([[+d.Lon1,+d.Lat1],[+d.Lon2,+d.Lat2]]);
+				})
+				.style("stroke",function(d) {
+					return color(+d.Points/+d.TotalFlights);
+				})
+				.style("stroke-width","4")
+				.on("mouseover", function(d) {		
+            						div.transition()		
+                						.duration(200)		
+                						.style("opacity", .9);		
+            						div	.html('<b>'+airports[d.A1]+' - '+airports[d.A2]+'</b>'
+            							+'<br />'+'Flights Delayed/Cancelled : '+d3.format('.1f')(+d.BadFlights*100/+d.TotalFlights)+'%<br />'
+            							+'Avg. Badness Score : '+d3.format('.1f')(d.Points/+d.TotalFlights))	
+                						.style("left", (d3.event.pageX) + "px")		
+                						.style("top", (d3.event.pageY - 28) + "px");	
+            	})
+				.on("mouseout", function(d) {		
+            						div.transition()		
+                						.duration(500)		
+                						.style("opacity", 0);	
+        		});
+
+        	/* First City */
+			cities.selectAll('circle')
+				.data(data)
+				.enter()
+				.append('circle')
+				.attr('cx', function (d) {return projection([+d.Lon1,+d.Lat1])[0];})
+				.attr('cy', function (d) {return projection([+d.Lon1,+d.Lat1])[1];})
+				.attr('r',10)
+				.attr('class','city1')
+				.style('fill','black')
+				.on("mouseover", function(d) {		
+            						div.transition()		
+                						.duration(200)		
+                						.style("opacity", .9);		
+            						div	.html('<b>'+airports[d.A1]+'</b>')	
+                						.style("left", (d3.event.pageX) + "px")		
+                						.style("top", (d3.event.pageY - 28) + "px");	
+            		})
+				.on("mouseout", function(d) {		
+            						div.transition()		
+                						.duration(500)		
+                						.style("opacity", 0);	
+        			});
+
+			/* Second City */
+			cities.selectAll('circle.city2')
+				.data(data)
+				.enter()
+				.append('circle')
+				.attr('class','city2')
+				.attr('cx', function (d) {return projection([+d.Lon2,+d.Lat2])[0];})
+				.attr('cy', function (d) {return projection([+d.Lon2,+d.Lat2])[1];})
+				.attr('r',10)
+				.attr('class','city')
+				.style('fill','black')
+				.on("mouseover", function(d) {		
+            						div.transition()		
+                						.duration(200)		
+                						.style("opacity", .9);		
+            						div	.html('<b>'+airports[d.A2]+'</b>')	
+                						.style("left", (d3.event.pageX) + "px")		
+                						.style("top", (d3.event.pageY - 28) + "px");	
+            		})
+				.on("mouseout", function(d) {		
+            						div.transition()		
+                						.duration(500)		
+                						.style("opacity", 0);	
+        			});
+
+		};
+		
+		function showAllFlights(years,seasons) {
+			for (var i=0; i<years.length; i++) {
+				var year = years[i];
+				for (var j=0; j<seasons.length; j++) {
+					var season = seasons[j];
+					var filename = "Flights_"+year+"_"+season+".csv";
+					d3.csv("/udacityData/"+filename, showFlights);
+				}
+			}
+		};
+
+		function showData(year, season) {
+			d3.selectAll('path.flights').remove();
+			
+			var years = document.getElementById('selectYear')
+			var seasons = document.getElementById('selectSeason');
+
+			var year_in = years.options[years.selectedIndex].value;
+			var season_in = seasons.options[seasons.selectedIndex].value;
+
+			showAllFlights([year_in],[season_in]);
+		};
+
+	</script>
+</body>
+</html>
+
