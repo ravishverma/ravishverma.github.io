@@ -5,14 +5,17 @@
 		Tooltip: http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 	-->
 	<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+	<script src="https://d3js.org/d3-timer.v1.min.js"></script>
+
 	<style>
 		path.states {
-			stroke: black;
-			fill: grey;
+			stroke: white;
+			fill: #002147;
 			stroke-width: 0.5px;
 			stroke-linejoin: round;
 			stroke-linecap: round;
 			pointer-events: none;
+			opacity: 0.8;
 		}
 
 		div.tooltip {	
@@ -26,11 +29,26 @@
     		pointer-events: none;			
 		}
 
+		.legendTitle {
+			font: 15px sans-serif;
+			font-weight: bold;
+		}
+
+		.legendText {
+			font: 14px sans-serif;
+		}
+
+		circle.city {
+			stroke: black;
+			fill: #BB133E;
+			stroke-width: 5px;
+		}
+
 	</style>
 </head>
 
 <body>
-	<h1 style="text-align:center;">Hello Uncle Sam, How was your flight?</h1>
+	<center><h1 style='visibility: hidden;'>Hello Uncle Sam, How was your flight?</h1></center>
 	<script type="text/javascript">
 		var width = 1000;
 		var height = 650;
@@ -38,20 +56,22 @@
 
 		/* Add a sv graphic */
 		var svg = d3.select("body")
+			.append('center')
 			.append("svg")
 			.attr("width", width+margin)
-			.attr("height", height+margin)
-			.style('float','left').style('margin-left','150px')
+			.attr("height", height+margin);
 			
 		var map = svg.append('g')
 			.attr('class','map');
 
 		/* Add a form */
 		var form = d3.select('body')
-			.append('div').attr('class','form');
+			.append('center')
+			.append('div').attr('class','form')
+			.style('visibility','hidden');
 
 		var selectYear = form.append('div').text('Year : ')
-			.style('width','105px').style('float','left').style('margin-left','500px')
+			.style('width','105px')
 			.append("select").attr('id','selectYear');
 
 		for (var i=1987; ; i++) {
@@ -63,7 +83,7 @@
 		}
 
 		var selectSeason = form.append('div').text(' Season : ')
-			.style('margin-left','20px').style('width','150px').style('float','left')
+			.style('width','150px')
 			.append("select").attr('id','selectSeason');
 			
 			selectSeason.append('option').attr('value','W').text('Winter')
@@ -72,7 +92,6 @@
 			selectSeason.append('option').attr('value','F').text('Fall');
 
 		var goButton = form.append('div')
-			.style('margin-left','50px').style('float','left')
 			.append('input')
 			.attr('type','button')
 			.attr('onclick','showData()')
@@ -105,6 +124,59 @@
 		var cities = svg.append('g')
 			.attr('class','city');
 
+		var legend = svg.append('g')
+			.attr('class','legend')
+			.style('visibility','hidden');
+
+		var gradient = legend.append('defs').append('linearGradient')
+			.attr('id','legendColor')
+
+		gradient
+			.attr('x1','0%')
+			.attr('y1','100%')
+			.attr('x2','0%')
+			.attr('y2','0%')
+			
+		gradient.append('stop').attr('offset','0%').attr('stop-color','#FFF000');
+		gradient.append('stop').attr('offset','50%').attr('stop-color','#FF0000');
+		gradient.append('stop').attr('offset','100%').attr('stop-color','#000000');
+
+		legend.append('rect')
+			.attr('x',margin+width-150).attr('y',margin+height-120)
+			.attr('width','140').attr('height','120')
+			.attr('fill','white').attr('stroke','black');
+
+		function drawLine(dx,dy) {
+			legend.append('line')
+			.attr('x1',margin+width-145).attr('y1',margin+height-95+dx)
+			.attr('x2',margin+width-120).attr('y2',margin+height-95+dy)
+			.attr('stroke','black');
+		}
+
+		drawLine(0,0);
+		drawLine(45,45);
+		drawLine(90,90);
+
+		legend.append('rect')
+			.attr('x',margin+width-145).attr('y',margin+height-95)
+			.attr('width','20').attr('height','90')
+			.attr('fill','url(#legendColor)').attr('stroke','black');
+
+		legend.append('text').attr('class','legendTitle')
+			.attr('x',margin+width-135).attr('y',margin+height-105)
+			.text('Suffering Score');
+
+		legend.append('text').attr('class','legendText')
+			.attr('x',margin+width-118).attr('y',margin+height-85)
+			.text('2 - Cancelled');
+		legend.append('text').attr('class','legendText')
+			.attr('x',margin+width-118).attr('y',margin+height-45)
+			.text('1 - Delayed');
+		legend.append('text').attr('class','legendText')
+			.attr('x',margin+width-118).attr('y',margin+height-5)
+			.text('0 - On Time');
+				
+
 		var airports = {'JFK':'New York',
 					'LAX' :'Los Angeles',
 					'ORD':'Chicago',
@@ -114,13 +186,17 @@
 				};
 
 		function showFlights(data) {
+			d3.selectAll('path.flights').remove();
+			d3.selectAll('circle.city').remove();
+
 			var line = d3.svg.line()
 					.x(function(d) { return projection([d[0],d[1]])[0]; })
 					.y(function(d) { return projection([d[0],d[1]])[1]; });
 
-			var color = d3.scale.linear()
-						.domain([0,2.0])
-						.range([d3.rgb('#0000FF'),d3.rgb('#FF0000')]);
+			var color = d3.scale.pow().exponent(2)
+						.domain([0,1.0,2.0])
+						.range([d3.rgb('#FFF000'),d3.rgb('#FF0000'),d3.rgb('#000000')]);
+
 
 			routes.selectAll("path")
 				.data(data)
@@ -130,17 +206,23 @@
 				.attr("d", function(d) {
 					return line([[+d.Lon1,+d.Lat1],[+d.Lon2,+d.Lat2]]);
 				})
+				.attr('data-legend', function(d) {
+					return +d.Points/+d.TotalFlights;
+				})
 				.style("stroke",function(d) {
 					return color(+d.Points/+d.TotalFlights);
 				})
-				.style("stroke-width","4")
+				.style("stroke-width",function(d) {
+					return +d.TotalFlights/70;
+				})
 				.on("mouseover", function(d) {		
             						div.transition()		
                 						.duration(200)		
                 						.style("opacity", .9);		
             						div	.html('<b>'+airports[d.A1]+' - '+airports[d.A2]+'</b>'
+            							+'<br />'+'Total Flights : '+d.TotalFlights
             							+'<br />'+'Flights Delayed/Cancelled : '+d3.format('.1f')(+d.BadFlights*100/+d.TotalFlights)+'%<br />'
-            							+'Avg. Badness Score : '+d3.format('.1f')(d.Points/+d.TotalFlights))	
+            							+'Avg. Suffering Score : '+d3.format('.1f')(d.Points/+d.TotalFlights))	
                 						.style("left", (d3.event.pageX) + "px")		
                 						.style("top", (d3.event.pageY - 28) + "px");	
             	})
@@ -158,8 +240,7 @@
 				.attr('cx', function (d) {return projection([+d.Lon1,+d.Lat1])[0];})
 				.attr('cy', function (d) {return projection([+d.Lon1,+d.Lat1])[1];})
 				.attr('r',10)
-				.attr('class','city1')
-				.style('fill','black')
+				.attr('class','city')
 				.on("mouseover", function(d) {		
             						div.transition()		
                 						.duration(200)		
@@ -184,7 +265,6 @@
 				.attr('cy', function (d) {return projection([+d.Lon2,+d.Lat2])[1];})
 				.attr('r',10)
 				.attr('class','city')
-				.style('fill','black')
 				.on("mouseover", function(d) {		
             						div.transition()		
                 						.duration(200)		
@@ -212,9 +292,7 @@
 			}
 		};
 
-		function showData(year, season) {
-			d3.selectAll('path.flights').remove();
-			
+		function showData(year, season) {			
 			var years = document.getElementById('selectYear')
 			var seasons = document.getElementById('selectSeason');
 
@@ -222,7 +300,189 @@
 			var season_in = seasons.options[seasons.selectedIndex].value;
 
 			showAllFlights([year_in],[season_in]);
+			timebox.text(seasons.options[seasons.selectedIndex].text+' of '+years.options[years.selectedIndex].text);
 		};
+
+
+		var chatbox = d3.select('body')
+			.append('center')
+			.append('div')
+			.attr('class','chat')
+			.style('position','absolute')
+			.style('top','10px')
+			.style('left','35%')
+			.style('width','400px')
+			.style('height','150px')
+			.style('border','3px')
+			.style('border-radius','8px')
+			.style('background','lightgreen');
+
+		var namebox = chatbox.append('center').append('div')
+			.style('height','30px')
+			.style('font','14px sans-serif')
+			.style('font-weight','bold')
+			.style('top','0px')
+			.text('Uncle Sam (Online)')
+
+		var msgT = chatbox
+			.append('div').attr('id','top')
+			.style('font','16px Courier New')
+			.style('text-align','left')
+			.style('left','0px')
+			.style('top','10px');
+
+		var msgB = chatbox
+			.append('div').attr('id','bot')
+			.style('font','16px Courier New')
+			.style('text-align','left')
+			.style('left','10px')
+			.style('top','30px');
+
+		msgT.text('');
+		msgB.text('');
+
+		function chat(person,diag) {
+			msgT.text(msgB.text())
+			msgT.style('text-align',msgB.style('text-align'))
+
+			if (person == 'U') {
+				msgB.text('> '+diag).style('text-align','left')
+			}
+			if (person == 'I') {
+				msgB.text(diag+' <').style('text-align','right')
+			}
+		}
+
+		var timebox = d3.select('body')
+			.append('center')
+			.append('div')
+			.attr('class','time')
+			.style('position','absolute')
+			.style('top','700px')
+			.style('left','35%')
+			.style('width','400px')
+			.style('height','35px')
+			.style('border','3px')
+			.style('border-radius','8px')
+			.style('background','grey')
+			.style('font','30px Courier New')
+			.style('font-weight','bold')
+			.style('vertical-align','center')
+			.style('color','white');
+
+		timebox.text('Click to End');
+			timebox
+				.on("mousedown",function(){
+					timebox.text('Select a Time');
+					end();
+				});
+
+		function landing() {
+			var tempo = 2000;
+			var i = 1;
+
+			setTimeout(function(){
+				chat('U','Hey, I am back');
+			},1*tempo);
+
+			setTimeout(function(){
+				chat('I','Good to hear that, Uncle Sam');
+			},2*tempo);
+
+			setTimeout(function(){
+				chat('I','How was your flight?');
+			},3*tempo);
+
+			setTimeout(function(){
+				chat('U',"It was just fine. A lot has changed in past few decades.");
+			},4*tempo);
+
+			setTimeout(function(){
+				chat('I',"Wow! You seem to be rather familiar with air travel history.");
+			},7*tempo);
+
+			setTimeout(function(){
+				chat('U',"Indeed. I am.");
+			},8*tempo);
+
+			setTimeout(function(){
+				legend.style('visibility','visible');
+				showAllFlights([1988],['W']);
+				timebox.style('visibility','visible').text('Winter of 1988');
+				chat('U','You know, back in 80s not every city was connected to each other.')
+			},9*tempo);
+
+			setTimeout(function(){
+				chat('U',"The number of flights available were lesser than today.");
+			},17*tempo);
+
+			setTimeout(function(){
+				chat('U',"Flights getting delayed or cancelled wasn't uncommon then. About 40-70% flights made passengers suffer.");
+			},20*tempo);
+
+			setTimeout(function(){
+				chat('U',"The air travel boomed in late 90s, with every other airline trying to please their customers.");
+			},23*tempo);
+
+			setTimeout(function(){
+				showAllFlights([1998],['W']);
+				timebox.text('Winter of 1998');
+				chat('U',"It wasn't just the number of flights, but also the number of routes that increased during this time.")
+			},27*tempo);
+
+			setTimeout(function(){
+				chat('I',"So those were the glory days!");
+			},32*tempo);
+
+			setTimeout(function(){
+				chat('I',"Why did dad tell me that they couldn't afford air travel when I was little?");
+			},37*tempo);
+
+			setTimeout(function(){
+				chat('U',"Yeah, I remember those unfortunate times.");
+				showAllFlights([2008],['W']);
+				timebox.text('Winter of 2008');
+			},42*tempo);
+
+			setTimeout(function(){
+				chat('U',"It was the global recession.");
+			},47*tempo);
+
+			setTimeout(function(){
+				chat('U',"Your dad lost his job and so did many other people all over the world.");
+			},49*tempo);
+
+			setTimeout(function(){
+				chat('U',"The air travel obviously got affected by this, because nobody had money to buy the tickets.");
+			},54*tempo);
+
+			setTimeout(function(){
+				chat('U',"Smile lad! Those days are gone :)");
+			},59*tempo);
+
+			setTimeout(function(){
+				chat('U',"I will leave you to your studies now.");
+			},64*tempo);
+
+			setTimeout(function(){
+				chat('U',"Bye");
+			},66*tempo);
+
+			setTimeout(function(){
+				chat('I',"Good bye uncle :)");
+				timebox.text('Click to End')
+			},67*tempo);
+		}
+
+		function end() {
+			timebox.transition().delay(200).style('top','100px')
+			legend.style('visibility','visible');
+			form.style('visibility','visible');
+			chatbox.style('visibility','hidden');
+			d3.select('h1').style('visibility','visible');
+		}
+
+		landing()
 
 	</script>
 </body>
