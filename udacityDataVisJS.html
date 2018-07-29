@@ -472,6 +472,8 @@
 		// 		Shows conversation between two people
 		//		and updates the visualization in context of the chat
 		function landing() {
+			// Best time
+			// Worst time 
 			var tempo = 2000;
 			var i = 1;
 
@@ -501,8 +503,8 @@
 
 			setTimeout(function(){
 				legend.style('visibility','visible');
-				showAllFlights([1988],['W']);
-				timebox.style('visibility','visible').text('Winter of 1988');
+				showAllFlights([1987],['W']);
+				timebox.style('visibility','visible').text('Winter of 1987');
 				summary.style('visibility','visible')
 				chat('U','You know, back in 80s not every city was connected to each other.')
 			},9*tempo);
@@ -516,60 +518,62 @@
 			},20*tempo);
 
 			setTimeout(function(){
-				chat('U',"The air travel boomed in late 90s, with every other airline trying to please their customers.");
+				chat('U',"Winter of 1987 had been the worst time in the history of airlines yet.");
 			},23*tempo);
+
+			setTimeout(function(){
+				chat('U',"The air travel boomed in late 90s, with every other airline trying to please their customers.");
+			},28*tempo);
 
 			setTimeout(function(){
 				showAllFlights([1998],['W']);
 				timebox.text('Winter of 1998');
 				chat('U',"It wasn't just the number of flights, but also the number of routes that increased during this time.")
-			},27*tempo);
-
-			setTimeout(function(){
-				chat('I',"So those were the glory days!");
 			},32*tempo);
 
 			setTimeout(function(){
-				chat('I',"Why did dad tell me that they couldn't afford air travel when I was little?");
+				chat('U',"By far Spring of 2003 is the most memorable time.");
+				showAllFlights([2003],['Sp']);
+				timebox.text('Spring of 2003');
+			},35*tempo);
+
+			setTimeout(function(){
+				chat('U',"There were hardly any flight cancellations.");
+			},36*tempo);
+
+			setTimeout(function(){
+				chat('U',"You had to be very unlucky to experience departure delays");
 			},37*tempo);
 
 			setTimeout(function(){
-				chat('U',"Yeah, I remember those unfortunate times.");
+				chat('U',"In recent times, airlines consistently maintain the schedule except on a few routes.");
 				showAllFlights([2008],['W']);
 				timebox.text('Winter of 2008');
-			},42*tempo);
+			},40*tempo);
 
 			setTimeout(function(){
-				chat('U',"It was the global recession.");
-			},47*tempo);
+				chat('U',"In general, there are most number of flights in Summer and least in Winter season");
+			},43*tempo);
 
 			setTimeout(function(){
-				chat('U',"Your dad lost his job and so did many other people all over the world.");
-			},49*tempo);
-
-			setTimeout(function(){
-				chat('U',"The air travel obviously got affected by this, because nobody had money to buy the tickets.");
-			},54*tempo);
-
-			setTimeout(function(){
-				chat('U',"Smile lad! Those days are gone :)");
-			},59*tempo);
+				chat('U',"Number of flights in Summer are 12% more than that in Winter");
+			},45*tempo);
 
 			setTimeout(function(){
 				chat('U',"I will leave you to your studies now.");
-			},64*tempo);
+			},45*tempo);
 
 			setTimeout(function(){
 				chat('U',"Bye");
-			},66*tempo);
+			},46*tempo);
 
 			setTimeout(function(){
 				chat('I',"Good bye uncle :)");
-			},67*tempo);
+			},47*tempo);
 
 			setTimeout(function(){
 				end()
-			},69*tempo);
+			},49*tempo);
 		}
 
 		function end() {
