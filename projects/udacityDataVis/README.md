@@ -34,8 +34,8 @@ The filtered dataset contains flight data between only 6 airports
 I have further split the data into different files based on the season of the year.
 
 ## The Visualization
-Using the new data, I have created a visualization using JavaScript d3 library. The visualization give three major information for air travel in any particular year and season,
-1. Number of flights for every route -> In the form of thickness of the liens
+Using the new data, I have created a visualization using JavaScript d3 library. The visualization gives three major information for air travel in any particular year and season,
+1. Number of flights for every route -> In the form of thickness of the lines
 1. Suffering score on each route -> This is an average of points for delay and cancellation shown as color code
 1. Summary -> This contains total flights and suffering score for all the routes in the selected time period
 

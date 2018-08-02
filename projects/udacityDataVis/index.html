@@ -35,12 +35,12 @@
 			font-weight: bold;
 		}
 
-		.legendTitle {
+		.blockTitle {
 			font: 15px sans-serif;
 			font-weight: bold;
 		}
 
-		.legendText {
+		.blockText {
 			font: 14px sans-serif;
 		}
 
@@ -64,6 +64,7 @@
 		// Parameters for SVG element size
 		var width = 1000;
 		var height = 550;
+		var extraHeight = 200;
 		var margin = 5;
 
 		// Adding an SVG element
@@ -79,8 +80,10 @@
 
 		// A division for user inputs
 		var form = d3.select('body')
-			.append('center')
 			.append('div').attr('class','form')
+			.style('position','absolute')
+			.style('left','45%')
+			.style('top',margin+height+extraHeight/1.5)
 			.style('visibility','hidden');
 
 		// A division for year selection
@@ -197,39 +200,44 @@
 			.attr('fill','url(#legendColor)').attr('stroke','black');
 
 		// Label of data
-		legend.append('text').attr('class','legendTitle')
+		legend.append('text').attr('class','blockTitle')
 			.attr('x',margin+width-135).attr('y',margin+height-105)
 			.text('Suffering Score');
 
-		legend.append('text').attr('class','legendText')
+		legend.append('text').attr('class','blockText')
 			.attr('x',margin+width-118).attr('y',margin+height-85)
 			.text('2 - Cancelled');
-		legend.append('text').attr('class','legendText')
+		legend.append('text').attr('class','blockText')
 			.attr('x',margin+width-118).attr('y',margin+height-45)
 			.text('1 - Delayed');
-		legend.append('text').attr('class','legendText')
+		legend.append('text').attr('class','blockText')
 			.attr('x',margin+width-118).attr('y',margin+height-5)
 			.text('0 - On Time');
 
 		// Summary block
-		summary = d3.select("svg").append('g')
-			.append('div')
-			.style('position','absolute')
-			.style('left',margin+width+50+'px').style('top',margin+height-170+'px')
-			.style('width','160px').style('height','70px')
-			.style('stroke','black')
-			.style('border-radius','8px')
-			.style('background','yellow')
+		var summary = svg.append('g')
+			.attr('class','summary')
 			.style('visibility','hidden');
 
-		summary.append('center').append('div').attr('class','summary')
-				.style('height','20px')
-				.text("Summary");
+		summary.append('rect')
+			.attr('x',margin+width-160).attr('y',margin+height-220)
+			.attr('rx',10).attr('ry',10)
+			.attr('width','160').attr('height','80')
+			.attr('fill','yellow').attr('stroke','black');
 
-		summaryEntry = summary.append('div')
-				.style('position','absolute')
-				.style('left','10px').style('top','20px')
-				.style('width','145px');
+		summary.append('text')
+			.attr('class','blockTitle')
+			.attr('x',margin+width-115).attr('y',margin+height-205)
+			.text('Summary')
+		var summary1 = summary.append('text')
+			.attr('class','blockText')
+			.attr('x',margin+width-145).attr('y',margin+height-180)
+			.attr('width','140').attr('height','20')
+		var summary2 = summary.append('text')
+			.attr('class','blockText')
+			.attr('x',margin+width-145).attr('y',margin+height-160)
+			.attr('width','140').attr('height','20')
+
 				
 		// Following stores name of Cities for each airport
 		var airports = {'JFK':'New York',
@@ -376,20 +384,36 @@
 				sumPoints = sumPoints + +data[i]["Points"]
 			}
 
-			summaryEntry.html('Total Flights : '+sumFlights+
-				'<br />'+'Avg. Score : '+d3.format('.2f')(sumPoints/sumFlights));
+			summary1
+				.text('Total Flights : '+sumFlights)
+			summary2
+				.text('Avg. Score : '+d3.format('.2f')(sumPoints/sumFlights));
 
 		};
+
+		// Box shows time of the displayed data
+		var animationWidth = 400;
+		var timebox = d3.select('body')
+			.append('center')
+			.append('div')
+			.attr('class','time')
+			.style('top',margin+height+extraHeight/3)
+			.style('width',animationWidth)
+			.style('height','35px')
+			.style('border','5px')
+			.style('border-radius','8px')
+			.style('background','grey')
+			.style('font','30px Courier New')
+			.style('font-weight','bold')
+			.style('vertical-align','center')
+			.style('color','white');
 
 		// This is the box that shows the chat messages
 		var chatbox = d3.select('body')
 			.append('center')
 			.append('div')
 			.attr('class','chat')
-			.style('position','absolute')
-			.style('top','660px')
-			.style('left','35%')
-			.style('width','400px')
+			.style('width',animationWidth)
 			.style('height','150px')
 			.style('border','3px')
 			.style('border-radius','8px')
@@ -422,14 +446,10 @@
 		msgB.text('');
 
 		// End animation option
-		var skip = chatbox
+		var skip = d3.select('body')
+				.append('center')
 				.append('div').attr('id','exit')
-				.style('position','absolute')
 				.style('font','14px sans-serif')
-				.style('right','0px')
-				.style('bottom','1px')
-				.style('height','20px')
-				.style('width','100px')
 				.text('[SKIP]');
 
 		// Box to be used to end animation
@@ -449,24 +469,6 @@
 				msgB.text(diag+' <').style('text-align','right')
 			}
 		}
-
-		// Box shows time of the displayed data
-		var timebox = d3.select('body')
-			.append('center')
-			.append('div')
-			.attr('class','time')
-			.style('position','absolute')
-			.style('top','620px')
-			.style('left','35%')
-			.style('width','400px')
-			.style('height','35px')
-			.style('border','3px')
-			.style('border-radius','8px')
-			.style('background','grey')
-			.style('font','30px Courier New')
-			.style('font-weight','bold')
-			.style('vertical-align','center')
-			.style('color','white');
 
 		// Function executes on page load
 		// 		Shows conversation between two people
@@ -577,12 +579,13 @@
 		}
 
 		function end() {
-			timebox.transition().delay(200).style('top','70px')
+			timebox.transition().delay(200).style('top',margin)
 			legend.style('visibility','visible');
 			form.style('visibility','visible');
 			chatbox.style('visibility','hidden');
 			d3.select('h1').style('visibility','visible');
 			summary.style('visibility','visible');
+			skip.style('visibility','hidden')
 		}
 
 		landing()
