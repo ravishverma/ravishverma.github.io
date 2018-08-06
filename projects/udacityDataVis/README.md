@@ -37,7 +37,8 @@ I have further split the data into different files based on the season of the ye
 Using the new data, I have created a visualization using JavaScript d3 library. The visualization gives three major information for air travel in any particular year and season,
 1. Number of flights for every route -> In the form of thickness of the lines
 1. Quality score on each route -> This is average Points/Flight for the route shown in color code. In earlier versions, I had used an inverted score representing bad quality, but it was difficult to interprete.
-1. Summary -> This contains total flights and average quality score for all the routes in the selected time period
+1. Fixed Summary -> This contains total flights and average quality score for all the routes in the selected time period
+1. Tool Tip for Every Flight Route -> This shows some data for every route on mouseover
 
 In the first version of visualization, I lacked contrast and ease of noting information. Based on the feedbacks from my friends, I refined the graphics, page layout and added animations into the final version. The animation helps in conveying a message to a visitor and also explain the graphics to some extent.
 
