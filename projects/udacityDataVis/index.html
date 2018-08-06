@@ -260,7 +260,7 @@
 			var season_in = seasons.options[seasons.selectedIndex].value;
 
 			showAllFlights([year_in],[season_in]);
-			timebox.text(seasons.options[seasons.selectedIndex].text+
+			timeboxtext(seasons.options[seasons.selectedIndex].text+
 				' of '+years.options[years.selectedIndex].text);
 		};
 
@@ -408,6 +408,12 @@
 			.style('vertical-align','center')
 			.style('color','white');
 
+		function timeboxtext(str) {
+			timebox.style('background','red');
+			timebox.text(str);
+			timebox.transition().style('background','grey').duration(1000);
+		}
+
 		// This is the box that shows the chat messages
 		var chatbox = d3.select('body')
 			.append('center')
@@ -438,6 +444,7 @@
 		var msgB = chatbox
 			.append('div').attr('id','bot')
 			.style('font','16px Courier New')
+			.style('font-weight','bold')
 			.style('text-align','left')
 			.style('left','10px')
 			.style('top','30px');
@@ -459,6 +466,8 @@
 
 		// A fucniton to update the alignment and content of message boxes
 		function chat(person,diag) {
+			chatbox.style('background','lightblue');
+			chatbox.transition().style('background','lightgreen').duration(1000);
 			msgT.text(msgB.text())
 			msgT.style('text-align',msgB.style('text-align'))
 
@@ -480,106 +489,89 @@
 			var i = 1;
 
 			setTimeout(function(){
-				chat('U','Hey, I am back');
+				chat('U','Hello visitor!');
 			},1*tempo);
 
 			setTimeout(function(){
-				chat('I','Good to hear that, Uncle Sam');
+				chat('U','I am going to tell you about air travel in USA between 6 major cities in past few decades.');
 			},2*tempo);
 
 			setTimeout(function(){
-				chat('I','How was your flight?');
-			},3*tempo);
-
-			setTimeout(function(){
-				chat('U',"It was just fine. A lot has changed in past few decades.");
-			},4*tempo);
-
-			setTimeout(function(){
-				chat('I',"Wow! You seem to be rather familiar with air travel history.");
-			},7*tempo);
-
-			setTimeout(function(){
-				chat('U',"Indeed. I am.");
-			},8*tempo);
+				chat('U',"City of Newyork, Los Angeles, Chicago, Portland, Albuquerque and Houston are located in different regions of US.");
+			},6*tempo);
 
 			setTimeout(function(){
 				legend.style('visibility','visible');
 				showAllFlights([1987],['W']);
-				timebox.style('visibility','visible').text('Winter of 1987');
+				timeboxtext('Winter of 1987');
 				summary.style('visibility','visible')
 				chat('U','You know, back in 80s not every city was connected to each other.')
 			},9*tempo);
 
 			setTimeout(function(){
-				chat('U',"The number of flights available were lesser than today.");
-			},17*tempo);
+				chat('U',"The number of flights available were lesser than today. You see this as thickness of the route.");
+			},12*tempo);
 
 			setTimeout(function(){
-				chat('U',"Flights getting delayed or cancelled wasn't uncommon then. About 40-70% flights made passengers suffer.");
-			},20*tempo);
+				chat('U',"About 40-70% flights made passengers suffer. The darker the route, more are the number of delays and cancellations.");
+			},18*tempo);
 
 			setTimeout(function(){
-				chat('U',"Winter of 1987 had been the worst time in the history of airlines yet.");
+				chat('U',"Winter of 1987 has been the worst time in the history of airlines yet.");
 			},23*tempo);
 
 			setTimeout(function(){
-				chat('U',"The air travel boomed in late 90s, with every other airline trying to please their customers.");
+				chat('U',"The air travel boomed in late 90s and became more competitive.");
 			},28*tempo);
 
 			setTimeout(function(){
 				showAllFlights([1998],['W']);
-				timebox.text('Winter of 1998');
+				timeboxtext('Winter of 1998');
 				chat('U',"It wasn't just the number of flights, but also the number of routes that increased during this time.")
 			},32*tempo);
 
 			setTimeout(function(){
 				chat('U',"By far Spring of 2003 is the most memorable time.");
 				showAllFlights([2003],['Sp']);
-				timebox.text('Spring of 2003');
-			},35*tempo);
+				timeboxtext('Spring of 2003');
+			},37*tempo);
 
 			setTimeout(function(){
 				chat('U',"There were hardly any flight cancellations.");
-			},36*tempo);
+			},39*tempo);
 
 			setTimeout(function(){
 				chat('U',"You had to be very unlucky to experience departure delays");
-			},37*tempo);
+			},41*tempo);
 
 			setTimeout(function(){
 				chat('U',"In recent times, airlines consistently maintain the schedule except on a few routes.");
 				showAllFlights([2008],['W']);
-				timebox.text('Winter of 2008');
-			},40*tempo);
+				timeboxtext('Winter of 2008');
+			},44*tempo);
 
 			setTimeout(function(){
 				chat('U',"In general, there are most number of flights in Summer and least in Winter season");
-			},43*tempo);
-
-			setTimeout(function(){
-				chat('U',"Number of flights in Summer are 12% more than that in Winter");
-			},45*tempo);
-
-			setTimeout(function(){
-				chat('U',"I will leave you to your studies now.");
-			},45*tempo);
-
-			setTimeout(function(){
-				chat('U',"Bye");
 			},46*tempo);
 
 			setTimeout(function(){
-				chat('I',"Good bye uncle :)");
-			},47*tempo);
+				chat('U',"Number of flights in Summer are 12% more than that in Winter");
+			},50*tempo);
+
+			setTimeout(function(){
+				chat('U',"I will leave you to to your own research now.");
+			},55*tempo);
+
+			setTimeout(function(){
+				chat('U',"Bye");
+			},57*tempo);
 
 			setTimeout(function(){
 				end()
-			},49*tempo);
+			},58*tempo);
 		}
 
 		function end() {
-			timebox.transition().delay(200).style('top',margin)
 			legend.style('visibility','visible');
 			form.style('visibility','visible');
 			chatbox.style('visibility','hidden');
