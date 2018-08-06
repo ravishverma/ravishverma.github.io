@@ -39,14 +39,14 @@ Using the new data, I have created a visualization using JavaScript d3 library. 
 1. Suffering score on each route -> This is an average of points for delay and cancellation shown as color code
 1. Summary -> This contains total flights and suffering score for all the routes in the selected time period
 
-In the first version of visualization, I lacked contrast and ease of noting information. Based on the feedbacks from my friends, I refined the graphics and added animation into the final version.
+In the first version of visualization, I lacked contrast and ease of noting information. Based on the feedbacks from my friends, I refined the graphics, page layout and added animations into the final version. The animation helps in conveying a message to a visitor and also explain the graphics to some extent.
 
 ### Feedbacks
 
 _Format of display is really nice. What seems off are the choice of colors. Some of the flight routes are really thin and do not get observed as easily_ - *Friend 1*
 
 
-_There is no take away for a lazy visitor. Only way to get numeric detail is to hover over the graphics._ - *Friend 2*
+_There is no take away for a lazy visitor. Only way to get numeric detail is to hover over the graphics. Also, the layout is different on my tablet and my desktop_ - *Friend 2*
 
 
 _It would become more attention grabing if an overall summary is shown to visitors during landing._ - *Friend 3*
