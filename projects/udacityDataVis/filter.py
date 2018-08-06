@@ -17,24 +17,24 @@ with open('Airport_LatLon_USA.csv','rU') as airportcode:
 
 # Scanning flight data for each year
 for year in range(1987,2008+1):
-	file_in = open(str(year)+'.csv','rU')
+	file_in = open('./originalData/'+str(year)+'.csv','rU')
 	reader = csv.DictReader(file_in)
 
 	# Segregating year wise data into each season
 	# Winter
-	file_outW = open('Flights_'+str(year)+'_W'+'.csv','w')
+	file_outW = open('./udacityData/Flights_'+str(year)+'_W'+'.csv','w')
 	writerW = csv.DictWriter(file_outW, fieldnames=fields_out)
 	writerW.writeheader()
 	# Spring
-	file_outSp = open('Flights_'+str(year)+'_Sp'+'.csv','w')
+	file_outSp = open('./udacityData/Flights_'+str(year)+'_Sp'+'.csv','w')
 	writerSp = csv.DictWriter(file_outSp, fieldnames=fields_out)
 	writerSp.writeheader()
 	# Summer
-	file_outSu = open('Flights_'+str(year)+'_Su'+'.csv','w')
+	file_outSu = open('./udacityData/Flights_'+str(year)+'_Su'+'.csv','w')
 	writerSu = csv.DictWriter(file_outSu, fieldnames=fields_out)
 	writerSu.writeheader()
 	# Fall
-	file_outF = open('Flights_'+str(year)+'_F'+'.csv','w')
+	file_outF = open('./udacityData/Flights_'+str(year)+'_F'+'.csv','w')
 	writerF = csv.DictWriter(file_outF, fieldnames=fields_out)
 	writerF.writeheader()
 
@@ -60,7 +60,7 @@ for year in range(1987,2008+1):
 
 			if key not in data:
 				data[key] = {}
-				data[key]['Points'] = 0
+				data[key]['Points'] = 0.0
 				data[key]['BadFlights'] = 0
 				data[key]['TotalFlights'] = 0
 
@@ -73,18 +73,21 @@ for year in range(1987,2008+1):
 			data[key]['Lat2'] = float(codes[route[1]][0])
 			data[key]['Lon2'] = -float(codes[route[1]][1])
 
-			delayed = ( float(row['DepDelay']) > 0 )
+			delayed = ( float(row['DepDelay']) >= 15 )
 			cancelled = ( int(float(row['Cancelled'])) == 1 )
 
 			# Given points to a flight route based on delay or cancellation of flight
 			if cancelled:
-				data[key]['Points'] = data[key]['Points'] + 2
+				data[key]['Points'] = data[key]['Points'] + 0
 
 			if delayed:
-				data[key]['Points'] = data[key]['Points'] + 1
+				data[key]['Points'] = data[key]['Points'] + 0.5
 
 			if delayed and cancelled:
-				data[key]['Points'] = data[key]['Points'] - 1
+				data[key]['Points'] = data[key]['Points'] - 0.5
+
+			if (not delayed) and (not cancelled):
+				data[key]['Points'] = data[key]['Points'] + 1.0
 
 			# Counting the number of flights
 			if delayed or cancelled:

@@ -128,7 +128,7 @@
 		  	 .projection(projection);
 
 		// us-states.json contains the map's geometric data
-		d3.json("/projects/udacityDataVis/udacityData/us-states.json", function(json) {
+		d3.json("/udacityData/us-states.json", function(json) {
 			map.selectAll("path")
 			.data(json.features)
 			.enter()
@@ -240,7 +240,7 @@
 				for (var j=0; j<seasons.length; j++) {
 					var season = seasons[j];
 					var filename = "Flights_"+year+"_"+season+".csv";
-					d3.csv("/projects/udacityDataVis/udacityData/"+filename, showFlights);
+					d3.csv("/udacityData/"+filename, showFlights);
 				}
 			}
 		};

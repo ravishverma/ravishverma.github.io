@@ -136,7 +136,7 @@
 		  	 .projection(projection);
 
 		// us-states.json contains the map's geometric data
-		d3.json("/projects/udacityDataVis/udacityData/us-states.json", function(json) {
+		d3.json("./udacityData/us-states.json", function(json) {
 			map.selectAll("path")
 			.data(json.features)
 			.enter()
@@ -168,13 +168,49 @@
 			.attr('y1','100%')
 			.attr('x2','0%')
 			.attr('y2','0%')
+
+		// Color triad
+		var low1 = '#000000'
+		var low2 = '#0000FF'
+		var mid1 = '#FF00FF'
+		var mid2 = '#FF0000'
+		var high1 = '#FFFF00'
+		var high2 = '#00FF00'
 			
 		gradient.append('stop').attr('offset','0%')
-			.attr('stop-color','#FFF000');
-		gradient.append('stop').attr('offset','50%')
-			.attr('stop-color','#FF0000');
+			.attr('stop-color',low1);
+		gradient.append('stop').attr('offset','16.67%')
+			.attr('stop-color',low1);
+		gradient.append('stop').attr('offset','16.67%')
+			.attr('stop-color',low2);
+		gradient.append('stop').attr('offset','33.33%')
+			.attr('stop-color',low2);
+		gradient.append('stop').attr('offset','33.33%')
+			.attr('stop-color',mid1);
+		gradient.append('stop').attr('offset','50.0%')
+			.attr('stop-color',mid1);
+		gradient.append('stop').attr('offset','50.0%')
+			.attr('stop-color',mid2);
+		gradient.append('stop').attr('offset','66.66%')
+			.attr('stop-color',mid2);
+		gradient.append('stop').attr('offset','66.66%')
+			.attr('stop-color',high1);
+		gradient.append('stop').attr('offset','83.33%')
+			.attr('stop-color',high1);
+		gradient.append('stop').attr('offset','83.33%')
+			.attr('stop-color',high2);
 		gradient.append('stop').attr('offset','100%')
-			.attr('stop-color','#000000');
+			.attr('stop-color',high2);
+
+		// Color scale to be used to color flight routes with score
+		function color(val) {
+				if (val>0.8333) {return d3.rgb(high2)}
+				if (val<=0.8333 && val>0.6666) {return d3.rgb(high1)}
+				if (val<=0.6666 && val>0.5) {return d3.rgb(mid2)}
+				if (val<=0.5 && val>0.3333) {return d3.rgb(mid1)}
+				if (val<=0.3333 && val>0.1667) {return d3.rgb(low2)}
+				if (val<=0.1667) {return d3.rgb(low1)}
+			}
 
 		// Outermost box of legend graphic
 		legend.append('rect')
@@ -191,7 +227,8 @@
 		}
 
 		drawLine(0,0);
-		drawLine(45,45);
+		drawLine(30,30);
+		drawLine(60,60);
 		drawLine(90,90);
 
 		// Gradient color bar
@@ -203,17 +240,31 @@
 		// Label of data
 		legend.append('text').attr('class','blockTitle')
 			.attr('x',margin+width-135).attr('y',margin+height-105)
-			.text('Suffering Score');
+			.text('Quality Score');
 
 		legend.append('text').attr('class','blockText')
-			.attr('x',margin+width-118).attr('y',margin+height-85)
-			.text('2 - Cancelled');
+			.attr('x',margin+width-80).attr('y',margin+height-85)
+			.text('Best');
 		legend.append('text').attr('class','blockText')
-			.attr('x',margin+width-118).attr('y',margin+height-45)
-			.text('1 - Delayed');
+			.attr('x',margin+width-120).attr('y',margin+height-85)
+			.text('1.00');
+
 		legend.append('text').attr('class','blockText')
-			.attr('x',margin+width-118).attr('y',margin+height-5)
-			.text('0 - On Time');
+			.attr('x',margin+width-80).attr('y',margin+height-45)
+			.text('Moderate');
+		legend.append('text').attr('class','blockText')
+			.attr('x',margin+width-120).attr('y',margin+height-60)
+			.text('0.67');
+		legend.append('text').attr('class','blockText')
+			.attr('x',margin+width-120).attr('y',margin+height-30)
+			.text('0.33');
+
+		legend.append('text').attr('class','blockText')
+			.attr('x',margin+width-80).attr('y',margin+height-5)
+			.text('Worst');
+		legend.append('text').attr('class','blockText')
+			.attr('x',margin+width-120).attr('y',margin+height-5)
+			.text('0.00');
 
 		// Summary block
 		var summary = svg.append('g')
@@ -276,7 +327,7 @@
 				for (var j=0; j<seasons.length; j++) {
 					var season = seasons[j];
 					var filename = "Flights_"+year+"_"+season+".csv";
-					d3.csv("/projects/udacityDataVis/udacityData/"+filename, showFlights);
+					d3.csv("./udacityData/"+filename, showFlights);
 				}
 			}
 		};
@@ -292,12 +343,6 @@
 			var line = d3.svg.line()
 					.x(function(d) { return projection([d[0],d[1]])[0]; })
 					.y(function(d) { return projection([d[0],d[1]])[1]; });
-
-			// Color scale to be used to color flight routes with score
-			var color = d3.scale.pow().exponent(2)
-						.domain([0,1.0,2.0])
-						.range([d3.rgb('#FFF000'),
-							d3.rgb('#FF0000'),d3.rgb('#000000')]);
 
 			// Flight routes between two cities
 			//		color is produced using average points
@@ -327,8 +372,8 @@
             				+'<br />'+'Flights Delayed/Cancelled : '
             				+d3.format('.1f')(+d.BadFlights*100/+d.TotalFlights)
             				+'%<br />'
-      						+'Avg. Suffering Score : '
-            				+d3.format('.1f')(d.Points/+d.TotalFlights))	
+      						+'Avg. Quality Score : '
+            				+d3.format('.2f')(d.Points/+d.TotalFlights))	
                			.style("left", (d3.event.pageX) + "px")		
            				.style("top", (d3.event.pageY - 28) + "px");	
             	})
@@ -392,6 +437,7 @@
 
 		};
 
+
 		// Box shows time of the displayed data
 		var animationWidth = 400;
 		var timebox = d3.select('body')
@@ -420,8 +466,8 @@
 			.append('center')
 			.append('div')
 			.attr('class','chat')
-			.style('width',animationWidth)
-			.style('height','150px')
+			.style('width',2*animationWidth)
+			.style('height','100px')
 			.style('border','3px')
 			.style('border-radius','8px')
 			.style('background','lightgreen');
@@ -514,62 +560,38 @@
 			},12*tempo);
 
 			setTimeout(function(){
-				chat('U',"About 40-70% flights made passengers suffer. The darker the route, more are the number of delays and cancellations.");
+				chat('U',"A low quality score means there are longer delays and frequent cancellations on the route.");
 			},18*tempo);
 
 			setTimeout(function(){
-				chat('U',"Winter of 1987 has been the worst time in the history of airlines yet.");
+				chat('U',"About 40-70% flights still make passengers suffer. But it is mostly because of delay and not cancellation.");
 			},23*tempo);
-
-			setTimeout(function(){
-				chat('U',"The air travel boomed in late 90s and became more competitive.");
-			},28*tempo);
 
 			setTimeout(function(){
 				showAllFlights([1998],['W']);
 				timeboxtext('Winter of 1998');
-				chat('U',"It wasn't just the number of flights, but also the number of routes that increased during this time.")
-			},32*tempo);
-
-			setTimeout(function(){
-				chat('U',"By far Spring of 2003 is the most memorable time.");
-				showAllFlights([2003],['Sp']);
-				timeboxtext('Spring of 2003');
-			},37*tempo);
-
-			setTimeout(function(){
-				chat('U',"There were hardly any flight cancellations.");
-			},39*tempo);
-
-			setTimeout(function(){
-				chat('U',"You had to be very unlucky to experience departure delays");
-			},41*tempo);
-
-			setTimeout(function(){
-				chat('U',"In recent times, airlines consistently maintain the schedule except on a few routes.");
-				showAllFlights([2008],['W']);
-				timeboxtext('Winter of 2008');
-			},44*tempo);
+				chat('U',"The air travel boomed in late 90s and yet the travel quality hasn't changed much.");
+			},28*tempo);
 
 			setTimeout(function(){
 				chat('U',"In general, there are most number of flights in Summer and least in Winter season");
-			},46*tempo);
+			},35*tempo);
 
 			setTimeout(function(){
 				chat('U',"Number of flights in Summer are 12% more than that in Winter");
-			},50*tempo);
+			},40*tempo);
 
 			setTimeout(function(){
 				chat('U',"I will leave you to to your own research now.");
-			},55*tempo);
+			},45*tempo);
 
 			setTimeout(function(){
 				chat('U',"Bye");
-			},57*tempo);
+			},47*tempo);
 
 			setTimeout(function(){
 				end()
-			},58*tempo);
+			},48*tempo);
 		}
 
 		function end() {
@@ -579,9 +601,24 @@
 			d3.select('h1').style('visibility','visible');
 			summary.style('visibility','visible');
 			skip.style('visibility','hidden')
+			keyObserv.style('visibility','visible')
 		}
 
 		landing()
+
+		var keyObserv = d3.select('body').append('center').append('div')
+						.style('width',2*animationWidth)
+						.style('text-align','left')
+						.style('visibility','hidden')
+
+		keyObserv.html('<h2>Key Observations</h2>'+
+			'<ul>'+'<li>The visualization shows air traffic between Newyork, Chicago, Los Angeles, Houston, Albuquerque and Portland</li>'
+			+'<li>Since 1987, the air traffic has increased by 400%</li>'
+			+'<li>In general, Summer season experiences 12% more air travel than Winter season.</li>'
+			+'<li>Many routes face frequent departure delays but cancellations are rare.</li>'
+			+'<li>The quality of air travel has stayed up high. It has never been below 0.85. This implies that fewer flights have suffered long delays or cancellations.</li>'
+			+'<li>By far, the Spring of 1994 has been the best period of air travel, with a score of 0.95</li>'
+			+'</ul></div>')
 
 	</script>
 </body>

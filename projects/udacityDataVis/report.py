@@ -45,3 +45,21 @@ for s in seasons:
 	if flights>0: data[s] = flights
 
 pp(data)
+
+print '\nYear wise'
+
+data = {}
+
+for y in years:
+	points = 0
+	flights = 0
+	for s in seasons:
+		with open('./udacityData/Flights_'+str(y)+'_'+s+'.csv','rU') as file:
+			reader = csv.DictReader(file)
+			for row in reader:
+				points = points + int(float(row['Points']))
+				flights = flights + int(float(row['TotalFlights']))
+
+	if flights>0: data[y] = flights
+
+pp(data)
