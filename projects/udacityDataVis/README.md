@@ -43,10 +43,10 @@ In the first version of visualization, I lacked contrast and ease of noting info
 
 ### Feedbacks
 
-_Format of display is really nice. What seems off are the choice of colors. Some of the flight routes are really thin and do not get observed as easily_ - *Friend 1*
+_"Format of display is really nice. What seems off are the choice of colors. Some of the flight routes are really thin and do not get observed as easily"_ - **Friend 1**
 
 
-_There is no take away for a lazy visitor. Only way to get numeric detail is to hover over the graphics. Also, the layout is different on my tablet and my desktop_ - *Friend 2*
+_"There is no take away for a lazy visitor. Only way to get numeric detail is to hover over the graphics. Also, the layout is different on my tablet and my desktop"_ - **Friend 2**
 
 
-_It would become more attention grabing if an overall summary is shown to visitors during landing._ - *Friend 3*
+_"It would become more attention grabing if an overall summary is shown to visitors during landing."_ - **Friend 3**
