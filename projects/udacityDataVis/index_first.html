@@ -227,8 +227,6 @@
 			var season_in = seasons.options[seasons.selectedIndex].value;
 
 			showAllFlights([year_in],[season_in]);
-			timebox.text(seasons.options[seasons.selectedIndex].text+
-				' of '+years.options[years.selectedIndex].text);
 		};
 
 		// Takes in a list of years and seasons
@@ -343,14 +341,6 @@
         			});
 
 		};
-
-		function end() {
-			legend.style('visibility','visible');
-			form.style('visibility','visible');
-			d3.select('h1').style('visibility','visible');
-		}
-
-		landing()
 
 	</script>
 </body>
