@@ -13,6 +13,7 @@ var navigate = d3.select('body')
 navigate.append('a').attr('href','/main.html').text('Home\t');
 navigate.append('a').attr('href','/travellogs/travellogs.html').text('TravelLogs\t');
 navigate.append('a').attr('href','/health/health.html').text('Health\t');
+navigate.append('a').attr('href','/projects/projects.html').text('Projects\t');
 navigate.append('a').attr('href','/main.html').text('Contact');
 
 document.getElementsByTagName('body')[0].insertBefore(document.createElement('hr'),document.getElementById('navigate'));
